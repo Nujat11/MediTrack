@@ -1,0 +1,465 @@
+{% extends "base.html" %}
+
+{% block title %}ড্যাশবোর্ড / Dashboard - MediTrack Bangladesh{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Active Profile & Context Banner (Vibrant Card) -->
+    <div class="bg-white rounded-3xl p-6 border border-teal-100 shadow-md shadow-teal-500/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 w-40 h-40 bg-gradient-to-br from-teal-400/10 to-indigo-400/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="relative z-10 flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-teal-600 via-emerald-500 to-cyan-400 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-teal-500/25">
+                {{ active_member.name[0] }}
+            </div>
+            <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="px-3 py-1 rounded-full text-xs font-black bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-sm" data-relationship="{{ active_member.relationship }}">
+                        {{ active_member.relationship }}
+                    </span>
+                    <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900">{{ active_member.name }}</h1>
+                    {% if active_member.blood_group %}
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-rose-500 text-white shadow-sm">
+                        {{ active_member.blood_group }}
+                    </span>
+                    {% endif %}
+                </div>
+                <p class="text-xs text-slate-500 mt-1.5 flex flex-wrap gap-2 items-center">
+                    {% if active_member.age %}
+                    <span class="font-bold text-slate-700">🎂 {{ active_member.age }} <span data-i18n="dash_age_suffix">বছর</span></span> •
+                    {% endif %}
+                    {% if active_member.chronic_conditions %}
+                    <span class="px-2.5 py-0.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold">
+                        🏥 {{ active_member.chronic_conditions }}
+                    </span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="relative z-10 flex items-center gap-2.5 w-full md:w-auto">
+            <a href="/medications" data-i18n="dash_add_med" class="flex-1 md:flex-initial px-5 py-2.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white rounded-2xl text-xs font-extrabold shadow-md shadow-teal-500/25 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-1.5">
+                ➕ নতুন ওষুধ যুক্ত করুন
+            </a>
+            <a href="/doctors" data-i18n="dash_find_doc" class="px-4 py-2.5 bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 text-indigo-700 border border-indigo-200 rounded-2xl text-xs font-bold transition">
+                ডাক্তার খুঁজুন
+            </a>
+        </div>
+    </div>
+
+    <!-- Ramadan Alert Notice (Vibrant Golden Amber) -->
+    <div id="ramadan-notice" class="hidden bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-2xl p-4 text-white shadow-lg shadow-amber-500/20 flex items-center gap-3 text-xs sm:text-sm">
+        <span class="text-3xl filter drop-shadow">🌙</span>
+        <div id="ramadan-notice-text" class="font-medium">
+            <strong data-i18n="dash_ramadan_notice_title" class="font-extrabold">রমজান মোড সক্রিয়:</strong> <span data-i18n="dash_ramadan_notice_desc">দুপুরের নিয়মিত ওষুধ চিকিৎসকের পরামর্শ অনুযায়ী সেহরি ও ইফতারের সময়ে সমন্বয় করে গ্রহণ করুন।</span>
+        </div>
+    </div>
+
+    <!-- 4 Colorful Stat Metric Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Metric 1: Scheduled (Vibrant Blue & Indigo) -->
+        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-5 rounded-3xl shadow-lg shadow-blue-500/20 glow-card glow-card-blue relative overflow-hidden">
+            <div class="absolute -right-3 -bottom-3 w-20 h-20 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+            <div class="flex justify-between items-start">
+                <span data-i18n="dash_total_doses" class="text-xs font-bold text-blue-100 uppercase tracking-wider">আজকের মোট ডোজ</span>
+                <span class="text-xl">📋</span>
+            </div>
+            <div class="mt-2 text-3xl sm:text-4xl font-black" id="stat-total">--</div>
+            <div data-i18n="dash_total_sub" class="text-[11px] text-blue-200 mt-1 font-medium">নির্ধারিত সময়মতো সেবন</div>
+        </div>
+
+        <!-- Metric 2: Taken (Vibrant Emerald & Teal) -->
+        <div class="bg-gradient-to-br from-emerald-50 to-teal-700 text-white p-5 rounded-3xl shadow-lg shadow-emerald-500/20 glow-card relative overflow-hidden">
+            <div class="absolute -right-3 -bottom-3 w-20 h-20 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+            <div class="flex justify-between items-start">
+                <span data-i18n="dash_taken" class="text-xs font-bold text-emerald-100 uppercase tracking-wider">গৃহীত (Taken)</span>
+                <span class="text-xl">✅</span>
+            </div>
+            <div class="mt-2 text-3xl sm:text-4xl font-black text-white" id="stat-taken">--</div>
+            <div data-i18n="dash_taken_sub" class="text-[11px] text-emerald-200 mt-1 font-medium">সফলভাবে গৃহীত ডোজ</div>
+        </div>
+
+        <!-- Metric 3: Missed (Vibrant Rose & Coral) -->
+        <div class="bg-gradient-to-br from-rose-500 to-pink-600 text-white p-5 rounded-3xl shadow-lg shadow-rose-500/20 glow-card relative overflow-hidden">
+            <div class="absolute -right-3 -bottom-3 w-20 h-20 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+            <div class="flex justify-between items-start">
+                <span data-i18n="dash_missed" class="text-xs font-bold text-rose-100 uppercase tracking-wider">বাদ পড়েছে (Missed)</span>
+                <span class="text-xl">⚠️</span>
+            </div>
+            <div class="mt-2 text-3xl sm:text-4xl font-black text-white" id="stat-missed">--</div>
+            <div data-i18n="dash_missed_sub" class="text-[11px] text-rose-200 mt-1 font-medium">ভুলে যাওয়া ডোজ</div>
+        </div>
+
+        <!-- Metric 4: Adherence (Vibrant Purple & Violet) -->
+        <div class="bg-gradient-to-br from-purple-600 to-violet-800 text-white p-5 rounded-3xl shadow-lg shadow-purple-500/20 glow-card glow-card-purple relative overflow-hidden">
+            <div class="absolute -right-3 -bottom-3 w-20 h-20 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+            <div class="flex justify-between items-start">
+                <span data-i18n="dash_adherence" class="text-xs font-bold text-purple-200 uppercase tracking-wider">৭ দিনের সফলতার হার</span>
+                <span class="text-xl">🏆</span>
+            </div>
+            <div class="mt-2 text-3xl sm:text-4xl font-black" id="stat-adherence">--%</div>
+            <div class="w-full bg-white/20 rounded-full h-2 mt-2.5 overflow-hidden">
+                <div id="stat-progress-bar" class="bg-emerald-300 h-2 rounded-full transition-all duration-500 shadow-sm" style="width: 0%"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Main Grid: Daily Doses & Chamber Card -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Today's Schedule by Slot -->
+        <div class="lg:col-span-2 space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                    <span data-i18n="dash_schedule_title">🕒 আজকের ওষুধের সময়সূচী ও ট্র্যাকিং</span>
+                </h2>
+                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200 px-3 py-1 rounded-xl shadow-sm" id="today-date-display">
+                    আজ
+                </span>
+            </div>
+
+            <!-- Slots Container -->
+            <div id="slots-container" class="space-y-4">
+                <div class="bg-white p-8 rounded-3xl border border-slate-200 text-center text-slate-400 text-sm shadow-sm" data-i18n="dash_loading_meds">
+                    ওষুধের তথ্য লোড হচ্ছে...
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Upcoming Chamber Appointment & Chart -->
+        <div class="space-y-6">
+            
+            <!-- Upcoming Chamber Consultation Card (Vibrant Deep Indigo with Golden Glow) -->
+            <div class="bg-gradient-to-br from-indigo-950 via-slate-900 to-teal-950 text-white rounded-3xl p-6 shadow-xl border border-indigo-900 relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-teal-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="flex justify-between items-start">
+                    <span data-i18n="dash_upcoming_serial" class="px-3 py-1 rounded-full bg-teal-400/20 text-teal-300 font-extrabold text-[11px] uppercase tracking-wider border border-teal-400/30">
+                        পরবর্তী চেম্বার সিরিয়াল
+                    </span>
+                    <a href="/appointments" data-i18n="dash_view_all" class="text-xs text-teal-300 font-bold hover:underline">সবগুলো দেখুন →</a>
+                </div>
+
+                {% if upcoming_appointment %}
+                <div class="mt-4 space-y-3">
+                    <h3 class="text-lg font-extrabold text-white">{{ upcoming_appointment.doctor_name }}</h3>
+                    <p class="text-xs text-teal-200 font-medium">{{ upcoming_appointment.specialty or "বিশেষজ্ঞ চিকিৎসক" }}</p>
+                    
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 space-y-2 mt-3 text-xs">
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-300" data-i18n="apt_chamber_label">চেম্বার:</span>
+                            <span class="font-bold text-white text-right">{{ upcoming_appointment.chamber_name }}</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1 border-t border-white/10">
+                            <span class="text-slate-300" data-i18n="dash_serial_label">সিরিয়াল:</span>
+                            <span class="font-black text-amber-300 bg-amber-400/20 px-2 py-0.5 rounded-lg border border-amber-300/30">{{ upcoming_appointment.serial_number or "সিরিয়াল বুকড" }}</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1 border-t border-white/10">
+                            <span class="text-slate-300" data-i18n="dash_datetime_label">তারিখ ও সময়:</span>
+                            <span class="font-semibold text-white">{{ upcoming_appointment.appointment_date }} | {{ upcoming_appointment.appointment_time }}</span>
+                        </div>
+                    </div>
+
+                    {% if upcoming_appointment.serial_contact %}
+                    <div class="pt-1">
+                        <a href="tel:{{ upcoming_appointment.serial_contact }}" class="block text-center py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-extrabold rounded-2xl text-xs transition shadow-md shadow-emerald-500/25">
+                            <span data-i18n="dash_chamber_call">📞 চেম্বারে কল করুন</span> ({{ upcoming_appointment.serial_contact }})
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="py-8 text-center text-xs text-teal-200/80 space-y-2">
+                    <p id="no-serial-text" class="text-sm" data-i18n="dash_no_serial">বর্তমানে কোনো আসন্ন ডাক্তারের সিরিয়াল নেই।</p>
+                    <div class="pt-2">
+                        <a href="/doctors" class="inline-block px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-extrabold rounded-xl shadow-md hover:scale-105 transition" data-i18n="dash_book_serial_btn">
+                            চেম্বার সিরিয়াল বুক করুন
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Adherence Trend Chart Card -->
+            <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-md">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 data-i18n="dash_chart_title" class="text-sm font-extrabold text-slate-800">৭ দিনের সেবন ধারাবাহিকতা</h3>
+                    <span data-i18n="dash_chart_sub" class="text-xs text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded-md">বার চার্ট</span>
+                </div>
+                <div class="h-44">
+                    <canvas id="adherenceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Emergency BD Contacts (Vibrant Card) -->
+            <div class="bg-gradient-to-br from-rose-50 via-white to-amber-50 rounded-3xl p-4 border border-rose-200 shadow-sm text-xs space-y-2.5">
+                <div class="font-extrabold text-rose-900 flex items-center gap-1.5 text-sm">
+                    <span>🚨</span> <span data-i18n="dash_helpline_title">জরুরি মেডিকেল হেল্পলাইন</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-rose-100">
+                    <span class="text-slate-600 font-medium" data-i18n="dash_shastho">স্বাস্থ্য বাতায়ন (২৪/৭ ডাক্তার):</span>
+                    <a href="tel:16263" class="font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-lg hover:underline">১৬২৬৩</a>
+                </div>
+                <div class="flex justify-between py-1 border-b border-rose-100">
+                    <span class="text-slate-600 font-medium" data-i18n="dash_national">জাতীয় জরুরি সেবা (অ্যাম্বুলেন্স):</span>
+                    <a href="tel:999" class="font-black text-rose-700 bg-rose-100 px-2 py-0.5 rounded-lg hover:underline">৯৯৯</a>
+                </div>
+                <div class="flex justify-between py-1">
+                    <span class="text-slate-600 font-medium" data-i18n="dash_birdem">বারডেম ডায়াবেটিস হেল্পলাইন:</span>
+                    <a href="tel:10609" class="font-black text-teal-700 bg-teal-100 px-2 py-0.5 rounded-lg hover:underline">১০৬০৯</a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let adherenceChartInstance = null;
+
+async function loadDashboardData() {
+    const memberId = document.getElementById('active-member-select') ? document.getElementById('active-member-select').value : null;
+    const url = memberId ? `/api/tracking/timeline?member_id=${memberId}` : '/api/tracking/timeline';
+
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const lang = getLanguage();
+        
+        // Update Stats
+        document.getElementById('stat-total').innerText = data.summary.total;
+        document.getElementById('stat-taken').innerText = data.summary.taken;
+        document.getElementById('stat-missed').innerText = data.summary.missed;
+        document.getElementById('stat-adherence').innerText = data.summary.adherence_rate + '%';
+        document.getElementById('stat-progress-bar').style.width = data.summary.adherence_rate + '%';
+        
+        // Date display
+        const dateObj = new Date(data.date);
+        document.getElementById('today-date-display').innerText = dateObj.toLocaleDateString(lang === 'bn' ? 'bn-BD' : 'en-US', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        renderSlots(data.timeline, data.date, memberId);
+        loadAdherenceChart(memberId);
+        applyTranslations();
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+function renderSlots(timeline, targetDate, memberId) {
+    const container = document.getElementById('slots-container');
+    container.innerHTML = '';
+    const lang = getLanguage();
+
+    const slotMetadata = {
+        morning: { 
+            title: t('slot_morning_title'), 
+            defaultTime: t('slot_morning_time'), 
+            headerClass: "slot-header-morning",
+            badgeClass: "bg-amber-100 text-amber-800 border-amber-200"
+        },
+        afternoon: { 
+            title: t('slot_afternoon_title'), 
+            defaultTime: t('slot_afternoon_time'), 
+            headerClass: "slot-header-afternoon",
+            badgeClass: "bg-sky-100 text-sky-800 border-sky-200"
+        },
+        night: { 
+            title: t('slot_night_title'), 
+            defaultTime: t('slot_night_time'), 
+            headerClass: "slot-header-night",
+            badgeClass: "bg-indigo-100 text-indigo-800 border-indigo-200"
+        },
+        bedtime: { 
+            title: t('slot_bedtime_title'), 
+            defaultTime: t('slot_bedtime_time'), 
+            headerClass: "slot-header-bedtime",
+            badgeClass: "bg-purple-100 text-purple-800 border-purple-200"
+        },
+        as_needed: { 
+            title: t('slot_sos_title'), 
+            defaultTime: t('slot_sos_time'), 
+            headerClass: "slot-header-sos",
+            badgeClass: "bg-rose-100 text-rose-800 border-rose-200"
+        }
+    };
+
+    let hasAnyDoses = false;
+
+    for (const [slotKey, doses] of Object.entries(timeline)) {
+        if (!doses || doses.length === 0) continue;
+        hasAnyDoses = true;
+        const meta = slotMetadata[slotKey] || { title: slotKey, defaultTime: "", headerClass: "bg-slate-700 text-white", badgeClass: "bg-slate-100" };
+
+        const card = document.createElement('div');
+        card.className = `bg-white rounded-3xl border border-slate-200/80 overflow-hidden shadow-md shadow-slate-200/50`;
+
+        let dosesHtml = '';
+        doses.forEach(dose => {
+            const isTaken = dose.status === 'taken';
+            const isMissed = dose.status === 'missed';
+
+            const btnTakenClass = isTaken 
+                ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25 ring-2 ring-emerald-400" 
+                : "bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300";
+            
+            const btnMissedClass = isMissed 
+                ? "bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-md shadow-rose-500/25 ring-2 ring-rose-400" 
+                : "bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200";
+
+            const btnTakenText = isTaken ? t('btn_taken') : t('btn_take');
+            const btnMissedText = isMissed ? t('btn_missed') : t('btn_miss');
+            const mealTimingText = translateMealTiming(dose.meal_timing, lang);
+
+            dosesHtml += `
+                <div class="p-5 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3.5 hover:bg-gradient-to-r hover:from-slate-50/80 hover:to-teal-50/20 transition">
+                    <div class="space-y-1.5 flex-1">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="font-extrabold text-slate-900 text-base">${dose.brand_name}</span>
+                            <span class="text-xs px-2.5 py-0.5 rounded-full font-bold ${meta.badgeClass} border">${dose.dosage_form} ${dose.strength || ''}</span>
+                        </div>
+                        <p class="text-xs text-teal-800 font-bold flex items-center gap-1.5">
+                            <span>🥄</span> <span>${mealTimingText}</span>
+                        </p>
+                        ${dose.instructions ? `<p class="text-xs text-slate-500 italic bg-slate-50 px-2 py-1 rounded-lg inline-block">“${dose.instructions}”</p>` : ''}
+                        ${dose.taken_at ? `<p class="text-xs text-emerald-700 font-extrabold flex items-center gap-1"><span>✨</span> ${t('dash_confirmed_at')} ${dose.taken_at}</p>` : ''}
+                    </div>
+
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        <button onclick="updateDose(${dose.medication_id}, '${slotKey}', 'taken', '${targetDate}', ${memberId})" 
+                            class="px-4 py-2 rounded-2xl text-xs font-extrabold transition transform hover:-translate-y-0.5 flex items-center gap-1 ${btnTakenClass}">
+                            ${btnTakenText}
+                        </button>
+                        <button onclick="updateDose(${dose.medication_id}, '${slotKey}', 'missed', '${targetDate}', ${memberId})" 
+                            class="px-3.5 py-2 rounded-2xl text-xs font-bold transition flex items-center gap-1 ${btnMissedClass}">
+                            ${btnMissedText}
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+
+        card.innerHTML = `
+            <div class="px-5 py-3.5 ${meta.headerClass} flex justify-between items-center shadow-inner">
+                <span class="text-xs sm:text-sm font-extrabold tracking-wide">${meta.title}</span>
+                <span class="text-xs font-black bg-white/20 backdrop-blur-sm px-2.5 py-0.5 rounded-full">${meta.defaultTime}</span>
+            </div>
+            <div>${dosesHtml}</div>
+        `;
+
+        container.appendChild(card);
+    }
+
+    if (!hasAnyDoses) {
+        container.innerHTML = `
+            <div class="bg-white p-10 rounded-3xl border border-teal-100 text-center space-y-3 shadow-sm">
+                <div class="text-4xl">💊</div>
+                <p class="text-slate-500 font-medium text-sm">${t('dash_no_meds')}</p>
+                <a href="/medications" class="inline-block px-5 py-2.5 bg-gradient-to-r from-teal-600 to-emerald-600 text-white text-xs font-extrabold rounded-2xl shadow-md shadow-teal-500/25 hover:scale-105 transition">
+                    ${t('dash_add_first_med')}
+                </a>
+            </div>
+        `;
+    }
+}
+
+async function updateDose(medicationId, slot, status, targetDate, memberId) {
+    try {
+        const res = await fetch('/api/tracking/log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                medication_id: medicationId,
+                member_id: memberId,
+                dose_date: targetDate,
+                slot: slot,
+                status: status
+            })
+        });
+
+        if (res.ok) {
+            const lang = getLanguage();
+            if (status === 'taken') {
+                playReminderChime();
+                showToast(lang === 'bn' ? "ওষুধ সেবন নিশ্চিত করা হয়েছে! 👍" : "Dose marked as Taken! 👍", "success");
+            } else {
+                showToast(lang === 'bn' ? "ওষুধ বাদ হিসেবে চিহ্নিত করা হয়েছে।" : "Dose marked as Missed.", "warning");
+            }
+            loadDashboardData();
+        }
+    } catch (e) {
+        showToast("Error updating dose status", "error");
+    }
+}
+
+async function loadAdherenceChart(memberId) {
+    try {
+        const url = memberId ? `/api/tracking/adherence?member_id=${memberId}&days=7` : '/api/tracking/adherence?days=7';
+        const res = await fetch(url);
+        const data = await res.json();
+        const lang = getLanguage();
+
+        const ctx = document.getElementById('adherenceChart').getContext('2d');
+        const labels = data.daily_breakdown.map(d => d.date);
+        const takenData = data.daily_breakdown.map(d => d.taken);
+        const missedData = data.daily_breakdown.map(d => d.missed);
+
+        if (adherenceChartInstance) {
+            adherenceChartInstance.destroy();
+        }
+
+        adherenceChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: lang === 'bn' ? 'গৃহীত (Taken)' : 'Taken Doses',
+                        data: takenData,
+                        backgroundColor: '#10b981',
+                        borderRadius: 8
+                    },
+                    {
+                        label: lang === 'bn' ? 'বাদ পড়েছে (Missed)' : 'Missed Doses',
+                        data: missedData,
+                        backgroundColor: '#f43f5e',
+                        borderRadius: 8
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11, weight: 'bold' } } }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } },
+                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } } }
+                }
+            }
+        });
+    } catch (e) {
+        console.error("Chart error:", e);
+    }
+}
+
+window.addEventListener('languageChanged', () => {
+    loadDashboardData();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    if (isRamadanMode()) {
+        const notice = document.getElementById('ramadan-notice');
+        if (notice) notice.classList.remove('hidden');
+    }
+    loadDashboardData();
+});
+</script>
+{% endblock %}

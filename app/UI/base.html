@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MediTrack BD - ওষুধ ও চিকিৎসা ট্র্যাকিং সিস্টেম{% endblock %}</title>
+    <!-- Instant Language Sync -->
+    <script>
+        (function() {
+            var l = localStorage.getItem('meditrack_lang') || 'bn';
+            document.documentElement.lang = l;
+        })();
+    </script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col antialiased">
+    
+    <!-- Top Healthcare Notice Bar (Vibrant Multi-tone Gradient) -->
+    <div class="bg-gradient-to-r from-teal-900 via-emerald-900 to-indigo-950 text-teal-100 px-4 py-1.5 text-xs font-semibold flex justify-between items-center border-b border-teal-800/60 shadow-inner">
+        <div class="flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+            <span data-i18n="emergency_notice">🇧🇩 বাংলাদেশ স্বাস্থ্য ও ওষুধ ট্র্যাকিং প্ল্যাটফর্ম (MediTrack Bangladesh)</span>
+        </div>
+        <div class="hidden md:flex items-center gap-4 text-emerald-200">
+            <span class="flex items-center gap-1">📞 <span data-i18n="helpline_health">জরুরি স্বাস্থ্য সেবা: ১৬২৬৩</span></span>
+            <span>•</span>
+            <span class="flex items-center gap-1">🚨 <span data-i18n="helpline_national">জাতীয় জরুরি সেবা: ৯৯৯</span></span>
+        </div>
+    </div>
+
+    <!-- Main Navigation Bar (Glassmorphic & Rich Accents) -->
+    <nav class="bg-white/95 backdrop-blur-md border-b border-teal-100 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                
+                <!-- Brand / Logo -->
+                <div class="flex items-center gap-3">
+                    <a href="{% if user %}/dashboard{% else %}/{% endif %}" class="flex items-center gap-2.5 group">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-teal-600 via-emerald-500 to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-teal-500/30 group-hover:scale-105 group-hover:rotate-3 transition transform duration-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="text-xl font-extrabold bg-gradient-to-r from-teal-700 via-emerald-600 to-cyan-600 bg-clip-text text-transparent">MediTrack</span>
+                            <span data-i18n="nav_brand_sub" class="text-[10px] block font-black uppercase tracking-widest text-teal-600 bg-teal-50 px-1.5 py-0.2 rounded-md">BD CARE</span>
+                        </div>
+                    </a>
+                </div>
+
+                {% if user %}
+                <!-- Center Navigation Links (Colorful Active Pills) -->
+                <div class="hidden lg:flex items-center gap-1.5">
+                    <a href="/dashboard" data-i18n="nav_dashboard" class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {% if active_page == 'dashboard' %}bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-md shadow-teal-500/25{% else %}text-slate-600 hover:text-teal-700 hover:bg-teal-50{% endif %}">
+                        📊 ড্যাশবোর্ড
+                    </a>
+                    <a href="/medications" data-i18n="nav_medications" class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {% if active_page == 'medications' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25{% else %}text-slate-600 hover:text-blue-700 hover:bg-blue-50{% endif %}">
+                        💊 ওষুধের রুটিন
+                    </a>
+                    <a href="/doctors" data-i18n="nav_doctors" class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {% if active_page == 'doctors' %}bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/25{% else %}text-slate-600 hover:text-indigo-700 hover:bg-indigo-50{% endif %}">
+                        👨‍⚕️ ডাক্তার ও চেম্বার
+                    </a>
+                    <a href="/appointments" data-i18n="nav_appointments" class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {% if active_page == 'appointments' %}bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/25{% else %}text-slate-600 hover:text-amber-700 hover:bg-amber-50{% endif %}">
+                        🗓️ সিরিয়াল ও ভিজিট
+                    </a>
+                    <a href="/prescriptions" data-i18n="nav_prescriptions" class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {% if active_page == 'prescriptions' %}bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-md shadow-rose-500/25{% else %}text-slate-600 hover:text-rose-700 hover:bg-rose-50{% endif %}">
+                        📁 প্রেসক্রিপশন ফাইল
+                    </a>
+                    <a href="/family" data-i18n="nav_family" class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {% if active_page == 'family' %}bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-md shadow-emerald-500/25{% else %}text-slate-600 hover:text-emerald-700 hover:bg-emerald-50{% endif %}">
+                        👨‍👩‍👧 পরিবার
+                    </a>
+                    {% if user.role == 'admin' %}
+                    <a href="/admin" data-i18n="nav_admin" class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {% if active_page == 'admin' %}bg-gradient-to-r from-amber-600 to-red-600 text-white shadow-md{% else %}text-amber-800 bg-amber-100/80 hover:bg-amber-200{% endif %}">
+                        ⚙️ অ্যাডমিন
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Right Action Bar (Vibrant Pill Controls) -->
+                <div class="flex items-center gap-2">
+                    
+                    <!-- Language Switcher Button (বাংলা <-> English) -->
+                    <button type="button" onclick="toggleLanguage()" class="bg-gradient-to-r from-teal-50 to-emerald-50 hover:from-teal-100 hover:to-emerald-100 border border-teal-300 text-teal-900 text-xs px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition shadow-sm font-bold">
+                        <span>🌐</span>
+                        <span id="lang-btn-label">English</span>
+                    </button>
+
+                    <!-- Ramadan Fasting Mode Toggle -->
+                    <button id="ramadan-toggle-btn" onclick="toggleRamadanMode()" data-i18n-title="nav_ramadan_title" title="রোজার সময়ে ওষুধের সময়সূচী পরিবর্তন করুন" class="bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 border border-amber-300 text-amber-900 text-xs px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition shadow-sm font-bold">
+                        <span>🌙</span>
+                        <span data-i18n="nav_ramadan" class="hidden sm:inline">রমজান মোড</span>
+                    </button>
+
+                    <!-- Active Family Member Dropdown -->
+                    {% if family_members %}
+                    <div class="relative">
+                        <select id="active-member-select" class="bg-gradient-to-r from-teal-600 to-emerald-600 text-white text-xs sm:text-sm font-bold rounded-xl px-3 py-1.5 shadow-md shadow-teal-500/20 focus:ring-2 focus:ring-teal-400 focus:outline-none cursor-pointer border-0">
+                            {% for m in family_members %}
+                            <option value="{{ m.id }}" class="bg-white text-slate-800 font-semibold" {% if active_member and active_member.id == m.id %}selected{% endif %}>
+                                👤 {{ m.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+
+                    <!-- User Account / Logout -->
+                    <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+                        <span class="text-xs font-bold text-slate-700 hidden md:inline px-2 py-1 bg-slate-100 rounded-lg">{{ user.name }}</span>
+                        <a href="/api/auth/logout" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition" data-i18n-title="nav_logout_title" title="লগআউট">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                {% else %}
+                <!-- Guest Actions -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <button type="button" onclick="toggleLanguage()" class="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-300 text-teal-900 text-xs px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition shadow-sm font-bold">
+                        <span>🌐</span>
+                        <span id="lang-btn-label">English</span>
+                    </button>
+                    <a href="/login" data-i18n="nav_login" class="text-sm font-bold text-slate-700 hover:text-teal-700 px-3.5 py-2 rounded-xl hover:bg-teal-50 transition">লগইন</a>
+                    <a href="/register" data-i18n="nav_register" class="text-sm font-extrabold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white px-5 py-2 rounded-xl shadow-md shadow-teal-500/25 transition transform hover:-translate-y-0.5">রেজিস্ট্রেশন</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if user %}
+        <!-- Mobile Bottom Bar for Small Screens -->
+        <div class="lg:hidden border-t border-teal-100 bg-white/95 backdrop-blur-md px-3 py-2.5 flex items-center justify-around overflow-x-auto text-xs shadow-inner">
+            <a href="/dashboard" data-i18n="nav_dashboard" class="px-2.5 py-1.5 rounded-lg font-bold {% if active_page == 'dashboard' %}bg-teal-600 text-white shadow-sm{% else %}text-slate-600{% endif %}">📊 ড্যাশবোর্ড</a>
+            <a href="/medications" data-i18n="nav_medications" class="px-2.5 py-1.5 rounded-lg font-bold {% if active_page == 'medications' %}bg-blue-600 text-white shadow-sm{% else %}text-slate-600{% endif %}">💊 ওষুধ</a>
+            <a href="/doctors" data-i18n="nav_doctors" class="px-2.5 py-1.5 rounded-lg font-bold {% if active_page == 'doctors' %}bg-indigo-600 text-white shadow-sm{% else %}text-slate-600{% endif %}">👨‍⚕️ ডাক্তার</a>
+            <a href="/appointments" data-i18n="nav_appointments" class="px-2.5 py-1.5 rounded-lg font-bold {% if active_page == 'appointments' %}bg-amber-500 text-white shadow-sm{% else %}text-slate-600{% endif %}">🗓️ সিরিয়াল</a>
+            <a href="/prescriptions" data-i18n="nav_prescriptions" class="px-2.5 py-1.5 rounded-lg font-bold {% if active_page == 'prescriptions' %}bg-rose-500 text-white shadow-sm{% else %}text-slate-600{% endif %}">📁 ফাইল</a>
+        </div>
+        {% endif %}
+    </nav>
+
+    <!-- Global Floating Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm"></div>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white/90 backdrop-blur-md border-t border-slate-200 mt-auto py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
+            <div>
+                <p class="font-bold text-slate-800" data-i18n="footer_rights">© 2026 MediTrack Bangladesh. All rights reserved.</p>
+                <p class="mt-0.5 text-slate-400" data-i18n="footer_disclaimer">মেডিট্র্যাক শুধুমাত্র ওষুধ ও ফলো-আপ সংরক্ষণের সহায়ক ডিজিটাল প্ল্যাটফর্ম।</p>
+            </div>
+            <div class="flex items-center gap-4 text-slate-600 font-semibold flex-wrap">
+                <span class="text-teal-700" data-i18n="footer_feat_bilingual">🌐 দ্বৈত ভাষা (বাংলা / English)</span>
+                <span>•</span>
+                <span class="text-indigo-700" data-i18n="footer_feat_bmdc">✓ BMDC ভেরিফাইড তথ্য</span>
+                <span>•</span>
+                <span class="text-emerald-700" data-i18n="footer_feat_caregiver">👨‍👩‍👧 সহজ কেয়ারগিভার ট্র্যাকিং</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

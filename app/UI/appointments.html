@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}অ্যাপয়েন্টমেন্ট ও চেম্বার সিরিয়াল - MediTrack Bangladesh{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 data-i18n="apt_title" class="text-2xl font-bold text-slate-900">ডাক্তার অ্যাপয়েন্টমেন্ট ও চেম্বার সিরিয়াল</h1>
+            <p class="text-xs text-slate-500 mt-1">
+                <span data-i18n="apt_patient_prefix">রোগী:</span> <strong class="text-teal-700">{{ active_member.name }}</strong> | <span data-i18n="apt_subtitle">চেম্বার ভিজিট ও ফলো-আপ ট্র্যাকার</span>
+            </p>
+        </div>
+        <a href="/doctors" class="px-4 py-2.5 bg-primary-700 hover:bg-primary-800 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-2">
+            <span data-i18n="apt_btn_add">➕ নতুন চেম্বার সিরিয়াল যুক্ত করুন</span>
+        </a>
+    </div>
+
+    <!-- Appointments Table / Cards -->
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <h2 data-i18n="apt_section_title" class="text-sm font-bold text-slate-800">নির্ধারিত ও পূর্ববর্তী চেম্বার ভিজিটসমূহ</h2>
+            <span class="text-xs text-slate-500">
+                {{ appointments|length }} <span data-i18n="apt_records_count">টি রেকর্ড</span>
+            </span>
+        </div>
+
+        {% if appointments %}
+        <div class="divide-y divide-slate-100">
+            {% for apt in appointments %}
+            <div class="p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-slate-50/70 transition">
+                <div class="space-y-2 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="font-bold text-base text-slate-900">{{ apt.doctor_name }}</span>
+                        {% if apt.specialty %}
+                        <span class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-semibold">{{ apt.specialty }}</span>
+                        {% endif %}
+                        <span data-status="{{ apt.status }}" class="text-xs px-2.5 py-0.5 rounded-full font-bold {% if apt.status == 'Upcoming' %}bg-amber-100 text-amber-800{% elif apt.status == 'Completed' %}bg-emerald-100 text-emerald-800{% else %}bg-slate-100 text-slate-600{% endif %}">
+                            {{ apt.status }}
+                        </span>
+                        {% if apt.serial_number %}
+                        <span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-teal-100 text-teal-900 border border-teal-300">
+                            {{ apt.serial_number }}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="text-xs text-slate-600 space-y-1">
+                        <p class="font-medium text-slate-800">🏢 {{ apt.chamber_name }}</p>
+                        <p class="flex items-center gap-4 flex-wrap text-slate-500">
+                            <span><span data-i18n="apt_date_label">📅 তারিখ:</span> <strong>{{ apt.appointment_date }}</strong></span>
+                            <span><span data-i18n="apt_time_label">⏰ সময়:</span> <strong>{{ apt.appointment_time }}</strong></span>
+                            {% if apt.serial_contact %}
+                            <span><span data-i18n="apt_hotline_label">📞 হটলাইন:</span> <a href="tel:{{ apt.serial_contact }}" class="text-primary-700 underline">{{ apt.serial_contact }}</a></span>
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    {% if apt.doctor_advice %}
+                    <p class="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <strong data-i18n="apt_advice_label">পরামর্শ / নোট:</strong> {{ apt.doctor_advice }}
+                    </p>
+                    {% endif %}
+
+                    {% if apt.follow_up_date %}
+                    <p class="text-xs text-teal-800 font-bold">
+                        <span data-i18n="apt_followup_label">🔄 পরবর্তী ফলো-আপ সাক্ষাত:</span> {{ apt.follow_up_date }}
+                    </p>
+                    {% endif %}
+                </div>
+
+                <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+                    {% if apt.status == 'Upcoming' %}
+                    <button onclick="updateAptStatus({{ apt.id }}, 'Completed')" data-i18n="apt_btn_complete" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition">
+                        ✓ সম্পন্ন
+                    </button>
+                    <button onclick="updateAptStatus({{ apt.id }}, 'Cancelled')" data-i18n="apt_btn_cancel" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+                        বাতিল
+                    </button>
+                    {% endif %}
+                    <button onclick="deleteApt({{ apt.id }})" data-i18n-title="meds_delete_tooltip" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" title="মুছে ফেলুন">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-12 text-center space-y-3">
+            <div class="text-4xl">🗓️</div>
+            <p data-i18n="apt_empty_text" class="text-slate-500 text-sm">কোনো চেম্বার সিরিয়াল বা অ্যাপয়েন্টমেন্ট তালিকাভুক্ত নেই।</p>
+            <a href="/doctors" data-i18n="apt_empty_btn" class="inline-block px-4 py-2 bg-primary-700 text-white text-xs font-bold rounded-xl hover:bg-primary-800 transition">
+                ডাক্তার ডিরেক্টরি থেকে সিরিয়াল নিন
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function updateAptStatus(id, status) {
+    try {
+        const res = await fetch(`/api/appointments/${id}/status?status=${status}`, { method: 'PUT' });
+        if (res.ok) {
+            showToast(t('apt_toast_updated'), "success");
+            setTimeout(() => window.location.reload(), 400);
+        }
+    } catch (e) {
+        showToast("Failed", "error");
+    }
+}
+
+async function deleteApt(id) {
+    if (!confirm(t('apt_confirm_delete'))) return;
+    try {
+        const res = await fetch(`/api/appointments/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            showToast(t('apt_toast_deleted'), "info");
+            setTimeout(() => window.location.reload(), 400);
+        }
+    } catch (e) {
+        showToast("Failed", "error");
+    }
+}
+</script>
+{% endblock %}

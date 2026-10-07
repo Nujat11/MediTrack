@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}পরিবারের সদস্য ও কেয়ারগিভার প্রোফাইল - MediTrack Bangladesh{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">পরিবার ও কেয়ারগিভার প্রোফাইল</h1>
+            <p class="text-xs text-slate-500 mt-1">
+                একই অ্যাকাউন্ট থেকে নিজের পাশাপাশি বাবা, মা বা পরিবারের যেকোনো সদস্যের স্বাস্থ্য ও ওষুধ পরিচালনা করুন
+            </p>
+        </div>
+        <button onclick="openAddMemberModal()" class="px-4 py-2.5 bg-primary-700 hover:bg-primary-800 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-2">
+            <span>➕</span> নতুন সদস্য যুক্ত করুন
+        </button>
+    </div>
+
+    <!-- Family Members Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for m in family_members %}
+        <div class="bg-white rounded-2xl border {% if active_member and active_member.id == m.id %}border-primary-500 ring-2 ring-primary-500/20{% else %}border-slate-200{% endif %} p-6 shadow-sm flex flex-col justify-between space-y-4">
+            <div class="space-y-3">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-primary-100 text-primary-800 uppercase tracking-wider">
+                            {{ m.relationship }}
+                        </span>
+                        <h2 class="text-lg font-bold text-slate-900 mt-1">{{ m.name }}</h2>
+                    </div>
+                    {% if m.blood_group %}
+                    <span class="px-2 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                        {{ m.blood_group }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div class="text-xs text-slate-600 space-y-1.5 bg-slate-50 p-3 rounded-xl">
+                    <p><strong>বয়স ও লিঙ্গ:</strong> {{ m.age or "অজানা" }} বছর • {{ m.gender or "অজানা" }}</p>
+                    {% if m.chronic_conditions %}
+                    <p class="text-teal-900 font-semibold">
+                        🏥 <strong>দীর্ঘস্থায়ী রোগ:</strong> {{ m.chronic_conditions }}
+                    </p>
+                    {% endif %}
+                    {% if m.allergies %}
+                    <p class="text-rose-700 font-medium">
+                        ⚠️ <strong>অ্যালার্জি:</strong> {{ m.allergies }}
+                    </p>
+                    {% endif %}
+                    {% if m.emergency_contact %}
+                    <p>📞 <strong>জরুরি নম্বর:</strong> {{ m.emergency_contact }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                <button onclick="selectAndSwitch({{ m.id }})" class="flex-1 py-2 rounded-xl text-xs font-bold transition {% if active_member and active_member.id == m.id %}bg-emerald-600 text-white shadow-sm{% else %}bg-primary-50 hover:bg-primary-100 text-primary-800 border border-primary-200{% endif %}">
+                    {{ "✓ বর্তমান প্রোফাইল" if active_member and active_member.id == m.id else "👉 এই প্রোফাইলে সুইচ করুন" }}
+                </button>
+                {% if m.relationship != 'Self' %}
+                <button onclick="deleteMember({{ m.id }})" class="p-2 text-slate-400 hover:text-rose-600 transition" title="মুছে ফেলুন">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<!-- Add Member Modal -->
+<div id="add-member-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+            <h3 class="text-base font-bold text-slate-900">পরিবারের নতুন সদস্য যুক্ত করুন</h3>
+            <button onclick="closeAddMemberModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
+        </div>
+
+        <form id="add-member-form" class="space-y-3 text-xs">
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">সদস্যের নাম</label>
+                <input type="text" id="member-name" required placeholder="উদাঃ মোঃ আব্দুল করিম (বাবা)" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">সম্পর্ক</label>
+                    <select id="member-relationship" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                        <option value="Father">বাবা (Father)</option>
+                        <option value="Mother">মা (Mother)</option>
+                        <option value="Spouse">স্ত্রী / স্বামী (Spouse)</option>
+                        <option value="Child">সন্তান (Child)</option>
+                        <option value="Sibling">ভাই / বোন (Sibling)</option>
+                        <option value="Self">নিজে (Self)</option>
+                        <option value="Other">অন্যান্য (Other)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">রক্তের গ্রুপ</label>
+                    <select id="member-blood" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold">
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">বয়স (বছর)</label>
+                    <input type="number" id="member-age" placeholder="যেমনঃ 62" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">লিঙ্গ</label>
+                    <select id="member-gender" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                        <option value="Male">পুরুষ (Male)</option>
+                        <option value="Female">মহিলা (Female)</option>
+                        <option value="Other">অন্যান্য</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">দীর্ঘস্থায়ী রোগ (যদি থাকে)</label>
+                <input type="text" id="member-chronic" placeholder="উদাঃ ডায়াবেটিস, উচ্চ রক্তচাপ, অ্যাজমা" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+            </div>
+
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">ওষুধের অ্যালার্জি (যদি থাকে)</label>
+                <input type="text" id="member-allergies" placeholder="উদাঃ সালফা ড্রাগ, পেনিসিলিন..." class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+            </div>
+
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">জরুরি যোগাযোগ নম্বর</label>
+                <input type="text" id="member-contact" placeholder="017xxxxxxxx" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+            </div>
+
+            <div class="pt-3 flex gap-2">
+                <button type="button" onclick="closeAddMemberModal()" class="w-1/2 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-100 transition">বাতিল</button>
+                <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-primary-700 hover:bg-primary-800 text-white font-bold transition">যুক্ত করুন</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openAddMemberModal() {
+    document.getElementById('add-member-modal').classList.remove('hidden');
+}
+function closeAddMemberModal() {
+    document.getElementById('add-member-modal').classList.add('hidden');
+}
+
+function selectAndSwitch(id) {
+    setActiveMemberId(id);
+}
+
+document.getElementById('add-member-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        name: document.getElementById('member-name').value,
+        relationship: document.getElementById('member-relationship').value,
+        age: parseInt(document.getElementById('member-age').value) || null,
+        gender: document.getElementById('member-gender').value,
+        blood_group: document.getElementById('member-blood').value,
+        chronic_conditions: document.getElementById('member-chronic').value || null,
+        allergies: document.getElementById('member-allergies').value || null,
+        emergency_contact: document.getElementById('member-contact').value || null
+    };
+
+    try {
+        const res = await fetch('/api/family', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+            const data = await res.json();
+            showToast("সদস্য যুক্ত হয়েছে!", "success");
+            setActiveMemberId(data.id);
+        } else {
+            showToast("সংরক্ষণ সম্ভব হয়নি", "error");
+        }
+    } catch (e) {
+        showToast("ত্রুটি ঘটেছে", "error");
+    }
+});
+
+async function deleteMember(id) {
+    if (!confirm("আপনি কি নিশ্চিত যে এই প্রোফাইলটি মুছে ফেলতে চান? এর সকল ওষুধ ও রেকর্ড মুছে যাবে।")) return;
+    try {
+        const res = await fetch(`/api/family/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            showToast("প্রোফাইল মুছে ফেলা হয়েছে", "info");
+            localStorage.removeItem('meditrack_active_member_id');
+            setTimeout(() => window.location.reload(), 500);
+        }
+    } catch (e) {
+        showToast("ব্যর্থ হয়েছে", "error");
+    }
+}
+</script>
+{% endblock %}

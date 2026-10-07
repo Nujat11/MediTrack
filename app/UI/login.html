@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}লগইন - MediTrack Bangladesh{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto my-8">
+    <div class="bg-white/95 backdrop-blur-md p-8 rounded-3xl border border-teal-100 shadow-xl shadow-teal-500/10">
+        <div class="text-center mb-6">
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-teal-500 via-emerald-500 to-cyan-400 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-teal-500/30 mb-3">
+                🔐
+            </div>
+            <h2 class="text-2xl font-black text-slate-900">অ্যাকাউন্টে লগইন করুন</h2>
+            <p class="text-xs text-slate-500 mt-1">আপনার ও পরিবারের ওষুধ ট্র্যাকিং ড্যাশবোর্ডে প্রবেশ করুন</p>
+        </div>
+
+        <!-- Quick Demo Fill Buttons (Colorful Pills) -->
+        <div class="mb-6 p-4 bg-gradient-to-r from-teal-50 to-indigo-50 border border-teal-200 rounded-2xl space-y-2.5">
+            <p class="text-xs font-black text-teal-900 flex items-center gap-1.5">
+                <span>⚡</span> <span>এক ক্লিকে ডেমো টেস্ট করুন:</span>
+            </p>
+            <div class="flex gap-2">
+                <button type="button" onclick="fillDemoUser()" class="flex-1 text-xs py-2 px-2.5 bg-white hover:bg-teal-50 text-teal-800 font-extrabold rounded-xl border border-teal-300 transition shadow-sm hover:scale-105 transform">
+                    👤 সাধারণ ইউজার
+                </button>
+                <button type="button" onclick="fillAdminUser()" class="flex-1 text-xs py-2 px-2.5 bg-white hover:bg-amber-50 text-amber-800 font-extrabold rounded-xl border border-amber-300 transition shadow-sm hover:scale-105 transform">
+                    ⚙️ অ্যাডমিন
+                </button>
+            </div>
+        </div>
+
+        <form id="login-form" class="space-y-4">
+            <div>
+                <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-1">ইমেইল ঠিকানা</label>
+                <input type="email" id="email" required placeholder="demo@meditrack.bd" class="w-full px-4 py-3 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm font-medium">
+            </div>
+
+            <div>
+                <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-1">পাসওয়ার্ড</label>
+                <input type="password" id="password" required placeholder="••••••••" class="w-full px-4 py-3 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm">
+            </div>
+
+            <div id="login-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold"></div>
+
+            <button type="submit" id="submit-btn" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-teal-600 via-emerald-600 to-cyan-600 hover:from-teal-700 hover:to-emerald-700 text-white font-black text-sm shadow-lg shadow-teal-500/25 transition transform hover:-translate-y-0.5">
+                লগইন করুন
+            </button>
+        </form>
+
+        <div class="mt-6 text-center text-xs text-slate-600 font-medium">
+            অ্যাকাউন্ট নেই? <a href="/register" class="text-teal-700 font-black hover:underline">নতুন অ্যাকাউন্ট খুলুন</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function fillDemoUser() {
+    document.getElementById('email').value = 'demo@meditrack.bd';
+    document.getElementById('password').value = 'password123';
+}
+function fillAdminUser() {
+    document.getElementById('email').value = 'admin@meditrack.bd';
+    document.getElementById('password').value = 'admin123';
+}
+
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    const errBox = document.getElementById('login-error');
+    errBox.classList.add('hidden');
+    btn.disabled = true;
+    btn.innerText = 'যাচাই করা হচ্ছে...';
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+        const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            throw new Error(data.detail || 'লগইন ব্যর্থ হয়েছে। তথ্য পরীক্ষা করুন।');
+        }
+        showToast('সফলভাবে লগইন হয়েছে!', 'success');
+        setTimeout(() => {
+            if (data.user && data.user.role === 'admin') {
+                window.location.href = '/admin';
+            } else {
+                window.location.href = '/dashboard';
+            }
+        }, 500);
+    } catch (err) {
+        errBox.innerText = err.message;
+        errBox.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerText = 'লগইন করুন';
+    }
+});
+</script>
+{% endblock %}

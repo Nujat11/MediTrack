@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}ওষুধের তালিকা ও রুটিন - MediTrack Bangladesh{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Header & Action -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl border border-teal-100 shadow-sm">
+        <div>
+            <h1 data-i18n="meds_page_title" class="text-2xl font-extrabold text-slate-900">ওষুধের তালিকা ও সময়সূচী</h1>
+            <p class="text-xs text-slate-500 mt-1">
+                <span data-i18n="meds_active_member_prefix">নির্বাচিত সদস্য:</span> <strong class="text-teal-700 font-bold">{{ active_member.name }}</strong>
+            </p>
+        </div>
+        <button onclick="openAddMedModal()" class="px-5 py-2.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white rounded-2xl text-xs sm:text-sm font-extrabold shadow-md shadow-blue-500/25 transition transform hover:-translate-y-0.5 flex items-center gap-2">
+            <span data-i18n="meds_btn_add">➕ নতুন ওষুধ যুক্ত করুন</span>
+        </button>
+    </div>
+
+    <!-- Medications List -->
+    <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-md shadow-slate-100">
+        <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-slate-50 via-teal-50/20 to-indigo-50/20">
+            <h2 data-i18n="meds_section_title" class="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                <span>💊</span> নিয়মিত ও চলমান ওষুধসমূহ
+            </h2>
+            <span class="text-xs font-black px-3 py-1 bg-teal-100 text-teal-800 rounded-full">
+                {{ medications|length }} <span data-i18n="meds_count_suffix">টি ওষুধ তালিকাভুক্ত</span>
+            </span>
+        </div>
+
+        {% if medications %}
+        <div class="divide-y divide-slate-100">
+            {% for med in medications %}
+            <div class="p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-gradient-to-r hover:from-slate-50/90 hover:to-teal-50/20 transition">
+                <div class="space-y-2 flex-1">
+                    <div class="flex items-center gap-2.5 flex-wrap">
+                        <span class="font-black text-lg text-slate-900">{{ med.brand_name }}</span>
+                        <span class="text-xs px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-300 font-extrabold">{{ med.dosage_form }}</span>
+                        {% if med.strength %}
+                        <span class="text-xs font-bold text-slate-500">({{ med.strength }})</span>
+                        {% endif %}
+                        <span class="text-xs px-3 py-0.5 rounded-full font-black bg-gradient-to-r from-amber-400 to-orange-400 text-slate-950 shadow-sm">
+                            {{ med.schedule_pattern }}
+                        </span>
+                        {% if med.is_chronic %}
+                        <span data-i18n="meds_chronic_badge" class="text-xs px-3 py-0.5 rounded-full font-black bg-emerald-500 text-white shadow-sm">
+                            ✓ নিয়মিত / দীর্ঘমেয়াদী
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    {% if med.generic_name %}
+                    <p class="text-xs text-slate-500 font-medium">
+                        <span data-i18n="meds_generic_label">জেনেরিক:</span> <span class="font-bold text-slate-700">{{ med.generic_name }}</span>
+                    </p>
+                    {% endif %}
+
+                    <div class="flex items-center gap-4 text-xs text-slate-600 flex-wrap">
+                        <span class="font-extrabold text-teal-800 bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200">
+                            🥄 <span data-meal-timing="{{ med.meal_timing }}">{{ med.meal_timing }}</span>
+                        </span>
+                        {% if med.doctor_name %}
+                        <span class="font-medium text-slate-700">
+                            <span data-i18n="meds_prescriber_label">👨‍⚕️ পরামর্শক:</span> <strong class="text-slate-900">{{ med.doctor_name }}</strong>
+                        </span>
+                        {% endif %}
+                        <span class="text-slate-500">
+                            <span data-i18n="meds_start_date">📅 শুরু:</span> {{ med.start_date }}
+                        </span>
+                        {% if med.end_date %}
+                        <span class="text-slate-500">
+                            <span data-i18n="meds_end_date">শেষ:</span> {{ med.end_date }}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    {% if med.instructions %}
+                    <p class="text-xs text-slate-600 italic bg-amber-50/60 border border-amber-200 p-2.5 rounded-xl inline-block font-medium">
+                        “{{ med.instructions }}”
+                    </p>
+                    {% endif %}
+                </div>
+
+                <div class="flex items-center gap-2.5 w-full md:w-auto justify-end">
+                    <button onclick="toggleMedStatus({{ med.id }})" data-status="{{ 'true' if med.is_active else 'false' }}" class="px-4 py-2 rounded-2xl text-xs font-black border transition transform hover:scale-105 {% if med.is_active %}bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20 border-transparent{% else %}bg-slate-100 text-slate-500 border-slate-300 hover:bg-slate-200{% endif %}">
+                        {{ "চলমান" if med.is_active else "স্থগিত" }}
+                    </button>
+                    <button onclick="deleteMed({{ med.id }})" data-i18n-title="meds_delete_tooltip" class="p-2.5 rounded-2xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" title="মুছে ফেলুন">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-16 text-center space-y-4">
+            <div class="text-5xl">💊</div>
+            <p data-i18n="meds_empty_text" class="text-slate-500 font-medium text-sm">কোনো ওষুধ যুক্ত করা হয়নি।</p>
+            <button onclick="openAddMedModal()" data-i18n="meds_empty_btn" class="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-teal-600 text-white text-xs font-black rounded-2xl shadow-md hover:scale-105 transition">
+                প্রথম ওষুধটি যুক্ত করুন
+            </button>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Add Medication Modal -->
+<div id="add-med-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto border border-teal-100">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+            <h3 data-i18n="meds_modal_title" class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <span>💊</span> নতুন ওষুধ যুক্ত করুন
+            </h3>
+            <button onclick="closeAddMedModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
+        </div>
+
+        <form id="add-med-form" class="space-y-4 text-xs">
+            <input type="hidden" id="med-member-id" value="{{ active_member.id }}">
+
+            <!-- Live Bangladeshi Catalog Search -->
+            <div class="relative">
+                <label data-i18n="meds_name_label" class="block font-black text-slate-700 uppercase mb-1">ওষুধের নাম (ব্র্যান্ড / জেনেরিক খুঁজুন)</label>
+                <input type="text" id="brand-name" required data-i18n-placeholder="meds_name_placeholder" placeholder="যেমনঃ Napa Extra, Seclo 20, Monas 10..." autocomplete="off" class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm font-bold text-slate-900">
+                <!-- Autocomplete Dropdown -->
+                <div id="search-suggestions" class="absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-2xl shadow-xl max-h-48 overflow-y-auto hidden z-20 divide-y divide-slate-100"></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label data-i18n="meds_generic_label_form" class="block font-black text-slate-700 uppercase mb-1">জেনেরিক নাম (ঐচ্ছিক)</label>
+                    <input type="text" id="generic-name" data-i18n-placeholder="meds_generic_placeholder" placeholder="Paracetamol, Omeprazole..." class="w-full px-3 py-2 rounded-2xl border border-slate-300 text-sm">
+                </div>
+                <div>
+                    <label data-i18n="meds_form_label" class="block font-black text-slate-700 uppercase mb-1">ওষুধের ধরন</label>
+                    <select id="dosage-form" class="w-full px-3 py-2 rounded-2xl border border-slate-300 text-sm font-bold text-slate-700">
+                        <option value="Tablet" data-i18n="meds_form_tablet">ট্যাবলেট (Tablet)</option>
+                        <option value="Capsule" data-i18n="meds_form_capsule">ক্যাপসুল (Capsule)</option>
+                        <option value="Syrup" data-i18n="meds_form_syrup">সিরাপ (Syrup)</option>
+                        <option value="Inhaler" data-i18n="meds_form_inhaler">ইনহেলার (Inhaler)</option>
+                        <option value="Drop" data-i18n="meds_form_drop">ড্রপ (Drop)</option>
+                        <option value="Injection" data-i18n="meds_form_injection">ইনজেকশন (Injection)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Bangladeshi Schedule Pattern -->
+            <div>
+                <label data-i18n="meds_pattern_label" class="block font-black text-slate-700 uppercase mb-1">প্রেসক্রিপশন ডোজের নিয়ম</label>
+                <select id="schedule-pattern" class="w-full px-3 py-2 rounded-2xl border border-teal-300 bg-teal-50 text-sm font-black text-teal-900">
+                    <option value="1+0+1" data-i18n="meds_pattern_101">১+০+১ (সকালে ১টি ও রাতে ১টি)</option>
+                    <option value="1+1+1" data-i18n="meds_pattern_111">১+১+১ (সকাল, দুপুর ও রাত)</option>
+                    <option value="1+0+0" data-i18n="meds_pattern_100">১+০+০ (শুধু সকালে)</option>
+                    <option value="0+1+0" data-i18n="meds_pattern_010">০+১+০ (শুধু দুপুরে)</option>
+                    <option value="0+0+1" data-i18n="meds_pattern_001">০+০+১ (শুধু রাতে)</option>
+                    <option value="1+0+0+1" data-i18n="meds_pattern_1001">১+০+০+১ (সকাল ও রাতে শোবার আগে)</option>
+                    <option value="SOS" data-i18n="meds_pattern_sos">SOS (প্রয়োজনে / ব্যথা হলে)</option>
+                </select>
+            </div>
+
+            <!-- Food timing -->
+            <div>
+                <label data-i18n="meds_meal_label" class="block font-black text-slate-700 uppercase mb-1">খাবার সাথে সম্পর্কিত নিয়ম</label>
+                <select id="meal-timing" class="w-full px-3 py-2 rounded-2xl border border-slate-300 text-sm font-bold text-slate-700">
+                    <option value="খাওয়ার পরে (After Meal)" data-i18n="meds_meal_after">খাওয়ার পরে (After Meal)</option>
+                    <option value="খাওয়ার ২০ মিনিট আগে (Before Meal)" data-i18n="meds_meal_before">খাওয়ার ২০ মিনিট আগে (Before Meal)</option>
+                    <option value="খালি পেটে (Empty Stomach)" data-i18n="meds_meal_empty">খালি পেটে (Empty Stomach)</option>
+                    <option value="রাতে শোবার আগে (At Bedtime)" data-i18n="meds_meal_bedtime">রাতে শোবার আগে (At Bedtime)</option>
+                </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label data-i18n="meds_start_label" class="block font-black text-slate-700 uppercase mb-1">শুরুর তারিখ</label>
+                    <input type="date" id="start-date" class="w-full px-3 py-2 rounded-2xl border border-slate-300 text-sm">
+                </div>
+                <div>
+                    <label data-i18n="meds_doctor_label" class="block font-black text-slate-700 uppercase mb-1">ডাক্তারের নাম</label>
+                    <input type="text" id="doctor-name" data-i18n-placeholder="meds_doctor_placeholder" placeholder="প্রেসক্রাইবার ডাক্তার" class="w-full px-3 py-2 rounded-2xl border border-slate-300 text-sm">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-1">
+                <input type="checkbox" id="is-chronic" class="w-4 h-4 text-emerald-600 rounded">
+                <label for="is-chronic" data-i18n="meds_chronic_check" class="font-extrabold text-slate-800">নিয়মিত ওষুধ (প্রেসার/সুগারের দীর্ঘস্থায়ী কোর্স)</label>
+            </div>
+
+            <div>
+                <label data-i18n="meds_instructions_label" class="block font-black text-slate-700 uppercase mb-1">বিশেষ নির্দেশনা / ডাক্তারের নোট</label>
+                <textarea id="instructions" rows="2" data-i18n-placeholder="meds_instructions_placeholder" placeholder="যেমনঃ পর্যাপ্ত পানি খাবেন, চিনি এড়িয়ে চলবেন..." class="w-full px-3 py-2 rounded-2xl border border-slate-300 text-sm"></textarea>
+            </div>
+
+            <div class="pt-3 flex gap-2">
+                <button type="button" onclick="closeAddMedModal()" data-i18n="btn_cancel" class="w-1/2 py-2.5 rounded-2xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-100 transition">বাতিল</button>
+                <button type="submit" data-i18n="btn_save" class="w-1/2 py-2.5 rounded-2xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-black shadow-md shadow-teal-500/25 transition">সংরক্ষণ করুন</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openAddMedModal() {
+    document.getElementById('add-med-modal').classList.remove('hidden');
+    document.getElementById('start-date').valueAsDate = new Date();
+}
+function closeAddMedModal() {
+    document.getElementById('add-med-modal').classList.add('hidden');
+}
+
+// Live Bangladeshi Medicine Search Autocomplete
+const brandInput = document.getElementById('brand-name');
+const suggestionsBox = document.getElementById('search-suggestions');
+
+brandInput.addEventListener('input', async (e) => {
+    const q = e.target.value.trim();
+    if (q.length < 2) {
+        suggestionsBox.classList.add('hidden');
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/medications/catalog/search?q=${encodeURIComponent(q)}`);
+        const items = await res.json();
+        const lang = getLanguage();
+        if (items.length > 0) {
+            suggestionsBox.innerHTML = '';
+            items.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'p-3 hover:bg-teal-50 cursor-pointer flex justify-between items-center text-xs';
+                row.innerHTML = `
+                    <div>
+                        <div class="font-black text-slate-900">${item.brand_name} <span class="font-normal text-slate-500">(${item.dosage_form})</span></div>
+                        <div class="text-slate-500 font-medium">${item.generic_name} • ${item.manufacturer || ''}</div>
+                    </div>
+                    <span class="text-teal-800 font-black text-[10px] bg-teal-100 px-2 py-0.5 rounded-md">${item.therapeutic_category || (lang === 'bn' ? 'মেডিসিন' : 'Medicine')}</span>
+                `;
+                row.addEventListener('click', () => {
+                    brandInput.value = item.brand_name;
+                    document.getElementById('generic-name').value = item.generic_name;
+                    document.getElementById('dosage-form').value = item.dosage_form;
+                    suggestionsBox.classList.add('hidden');
+                });
+                suggestionsBox.appendChild(row);
+            });
+            suggestionsBox.classList.remove('hidden');
+        } else {
+            suggestionsBox.classList.add('hidden');
+        }
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// Submit Form
+document.getElementById('add-med-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        member_id: parseInt(document.getElementById('med-member-id').value),
+        brand_name: document.getElementById('brand-name').value,
+        generic_name: document.getElementById('generic-name').value || null,
+        dosage_form: document.getElementById('dosage-form').value,
+        schedule_pattern: document.getElementById('schedule-pattern').value,
+        meal_timing: document.getElementById('meal-timing').value,
+        start_date: document.getElementById('start-date').value,
+        is_chronic: document.getElementById('is-chronic').checked,
+        doctor_name: document.getElementById('doctor-name').value || null,
+        instructions: document.getElementById('instructions').value || null
+    };
+
+    try {
+        const res = await fetch('/api/medications', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+            showToast(t('meds_toast_added'), "success");
+            setTimeout(() => window.location.reload(), 500);
+        } else {
+            const err = await res.json();
+            showToast(err.detail || "Error", "error");
+        }
+    } catch (e) {
+        showToast("Error saving medication", "error");
+    }
+});
+
+async function toggleMedStatus(id) {
+    try {
+        const res = await fetch(`/api/medications/${id}/toggle-status`, { method: 'PUT' });
+        if (res.ok) {
+            showToast(t('meds_toast_status'), "success");
+            setTimeout(() => window.location.reload(), 400);
+        }
+    } catch (e) {
+        showToast("Failed to update status", "error");
+    }
+}
+
+async function deleteMed(id) {
+    if (!confirm(t('meds_confirm_delete'))) return;
+    try {
+        const res = await fetch(`/api/medications/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            showToast(t('meds_toast_deleted'), "info");
+            setTimeout(() => window.location.reload(), 400);
+        }
+    } catch (e) {
+        showToast("Failed to delete", "error");
+    }
+}
+</script>
+{% endblock %}

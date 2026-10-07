@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}সিস্টেম অ্যাডমিন প্যানেল - MediTrack Bangladesh{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-amber-800 to-slate-900 rounded-2xl p-6 text-white shadow-md flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold">মেডিট্র্যাক অ্যাডমিন কন্ট্রোল প্যানেল</h1>
+            <p class="text-xs text-amber-200 mt-1">
+                সিস্টেম ডেটাবেজ, বাংলাদেশি ফার্মাসিউটিক্যালস ব্র্যান্ড ও বিশেষজ্ঞ ডাক্তার পরিচালনা
+            </p>
+        </div>
+        <span class="px-3 py-1 bg-amber-500/20 text-amber-300 border border-amber-400/30 rounded-xl text-xs font-bold">
+            অ্যাডমিন এক্সেস
+        </span>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
+            <div class="text-xs font-bold text-slate-500">মোট ইউজার</div>
+            <div class="text-2xl font-extrabold text-slate-900 mt-1" id="stat-adm-users">{{ stats.total_users }}</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
+            <div class="text-xs font-bold text-teal-600">চলমান ওষুধ</div>
+            <div class="text-2xl font-extrabold text-teal-600 mt-1">{{ stats.active_medications }}</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
+            <div class="text-xs font-bold text-primary-700">লগ হওয়া ডোজ</div>
+            <div class="text-2xl font-extrabold text-primary-700 mt-1">{{ stats.total_doses_logged }}</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
+            <div class="text-xs font-bold text-indigo-600">ক্যাটালগ ওষুধ</div>
+            <div class="text-2xl font-extrabold text-indigo-600 mt-1">{{ stats.total_catalog_medicines }}</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
+            <div class="text-xs font-bold text-amber-600">মোট ডাক্তার</div>
+            <div class="text-2xl font-extrabold text-amber-600 mt-1">{{ stats.total_doctors }}</div>
+        </div>
+    </div>
+
+    <!-- Admin Actions Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Add Medicine to Catalog Form -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <span>💊</span> নতুন বাংলাদেশি ফার্মা ব্র্যান্ড যুক্ত করুন
+            </h2>
+            <form id="add-catalog-med-form" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">ব্র্যান্ড নাম (Brand Name)</label>
+                    <input type="text" id="cat-brand" required placeholder="উদাঃ Napa Extra, Seclo 20, Monas 10" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">জেনেরিক উপাদান (Generic Name)</label>
+                    <input type="text" id="cat-generic" required placeholder="উদাঃ Paracetamol + Caffeine" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">ধরন (Form)</label>
+                        <select id="cat-form" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                            <option value="Tablet">Tablet</option>
+                            <option value="Capsule">Capsule</option>
+                            <option value="Syrup">Syrup</option>
+                            <option value="Inhaler">Inhaler</option>
+                            <option value="Drop">Drop</option>
+                            <option value="Injection">Injection</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">মাত্রা (Strength)</label>
+                        <input type="text" id="cat-strength" placeholder="500mg / 20mg" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">কোম্পানি / প্রস্তুতকারক (Manufacturer)</label>
+                    <input type="text" id="cat-company" placeholder="Square / Beximco / Incepta / Renata" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">থেরাপিউটিক ক্যাটাগরি</label>
+                    <input type="text" id="cat-category" placeholder="Gastric / Pain / Diabetes / Hypertension" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-primary-700 hover:bg-primary-800 text-white font-bold rounded-xl transition">
+                    ক্যাটালগে যুক্ত করুন
+                </button>
+            </form>
+        </div>
+
+        <!-- Add Doctor to Directory Form -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <span>👨‍⚕️</span> নতুন বিশেষজ্ঞ ডাক্তার ও চেম্বার যুক্ত করুন
+            </h2>
+            <form id="add-doc-form" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">ডাক্তারের পূর্ণ নাম</label>
+                    <input type="text" id="doc-name" required placeholder="অধ্যাপক ডাঃ..." class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">বিভাগ (Specialty)</label>
+                        <input type="text" id="doc-specialty" required placeholder="মেডিসিন / কার্ডিওলজি" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">BMDC রেজিঃ নম্বর</label>
+                        <input type="text" id="doc-bmdc" placeholder="A-xxxxx" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">ডিগ্রী ও পদবী (Qualifications)</label>
+                    <input type="text" id="doc-degrees" required placeholder="MBBS, FCPS, MD..." class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">হাসপাতাল (Hospital Affiliation)</label>
+                    <input type="text" id="doc-hospital" placeholder="DMCH / BSMMU / NICVD" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">এলাকা (Area)</label>
+                        <input type="text" id="doc-area" required placeholder="ধানমন্ডি / উত্তরা / মিরপুর" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">চেম্বার ডায়াগনস্টিক</label>
+                        <input type="text" id="doc-chamber" required placeholder="পপুলার / ইবনে সিনা / ল্যাবএইড" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">সিরিয়াল ফোন নম্বর</label>
+                        <input type="text" id="doc-phone" required placeholder="017xxxxxxxx" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">ভিজিট ফি (৳)</label>
+                        <input type="number" id="doc-fee" value="1000" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold">
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-amber-700 hover:bg-amber-800 text-white font-bold rounded-xl transition">
+                    ডিরেক্টরিতে ডাক্তার যুক্ত করুন
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- Registered Users Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <h2 class="text-sm font-bold text-slate-800">নিবন্ধিত ব্যবহারকারী তালিকা</h2>
+            <span class="text-xs text-slate-500">{{ users|length }} জন ইউজার</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 uppercase border-b border-slate-200">
+                    <tr>
+                        <th class="p-3">আইডি</th>
+                        <th class="p-3">নাম</th>
+                        <th class="p-3">ইমেইল</th>
+                        <th class="p-3">ফোন</th>
+                        <th class="p-3">রোল</th>
+                        <th class="p-3">নিবন্ধন তারিখ</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for u in users %}
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-mono font-bold text-slate-500">#{{ u.id }}</td>
+                        <td class="p-3 font-bold text-slate-900">{{ u.name }}</td>
+                        <td class="p-3 text-slate-600 font-mono">{{ u.email }}</td>
+                        <td class="p-3 text-slate-600">{{ u.phone or '-' }}</td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold {% if u.role == 'admin' %}bg-amber-100 text-amber-800{% else %}bg-slate-100 text-slate-700{% endif %}">
+                                {{ u.role }}
+                            </span>
+                        </td>
+                        <td class="p-3 text-slate-500">{{ u.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('add-catalog-med-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        brand_name: document.getElementById('cat-brand').value,
+        generic_name: document.getElementById('cat-generic').value,
+        dosage_form: document.getElementById('cat-form').value,
+        strength: document.getElementById('cat-strength').value || null,
+        manufacturer: document.getElementById('cat-company').value || null,
+        therapeutic_category: document.getElementById('cat-category').value || null
+    };
+
+    try {
+        const res = await fetch('/api/admin/medicines', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+            showToast("ক্যাটালগে ওষুধ যুক্ত হয়েছে!", "success");
+            e.target.reset();
+            setTimeout(() => window.location.reload(), 500);
+        } else {
+            showToast("ব্যর্থ হয়েছে", "error");
+        }
+    } catch (e) {
+        showToast("ত্রুটি ঘটেছে", "error");
+    }
+});
+
+document.getElementById('add-doc-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        name: document.getElementById('doc-name').value,
+        specialty: document.getElementById('doc-specialty').value,
+        degrees: document.getElementById('doc-degrees').value,
+        bmdc_reg_no: document.getElementById('doc-bmdc').value || null,
+        hospital_affiliation: document.getElementById('doc-hospital').value || null,
+        area: document.getElementById('doc-area').value,
+        chamber_name: document.getElementById('doc-chamber').value,
+        serial_phone: document.getElementById('doc-phone').value,
+        consultation_fee: parseInt(document.getElementById('doc-fee').value) || 1000
+    };
+
+    try {
+        const res = await fetch('/api/admin/doctors', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+            showToast("ডাক্তার সফলভাবে যুক্ত হয়েছেন!", "success");
+            e.target.reset();
+            setTimeout(() => window.location.reload(), 500);
+        } else {
+            showToast("ব্যর্থ হয়েছে", "error");
+        }
+    } catch (e) {
+        showToast("ত্রুটি ঘটেছে", "error");
+    }
+});
+</script>
+{% endblock %}

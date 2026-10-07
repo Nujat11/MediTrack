@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}ডাক্তার ও চেম্বার ডিরেক্টরি - MediTrack Bangladesh{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Header Banner (Vibrant Multi-tone Gradient) -->
+    <div class="bg-gradient-to-r from-teal-800 via-indigo-900 to-purple-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+        <div class="absolute -right-8 -top-8 w-48 h-48 bg-teal-400/20 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="relative z-10 max-w-2xl space-y-2">
+            <span data-i18n="doc_bmdc_badge" class="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-teal-200 text-xs font-black uppercase tracking-wider">
+                🇧🇩 BMDC নিবন্ধিত বিশেষজ্ঞ ডাক্তার
+            </span>
+            <h1 data-i18n="doc_banner_title" class="text-2xl sm:text-3xl font-black">বাংলাদেশ স্পেশালিস্ট ও চেম্বার ডিরেক্টরি</h1>
+            <p data-i18n="doc_banner_sub" class="text-xs sm:text-sm text-teal-100/90 leading-relaxed">
+                ঢাকা, চট্টগ্রাম ও প্রধান শহরসমূহের স্বনামধন্য বিশেষজ্ঞ চিকিৎসক ও ডায়াগনস্টিক সেন্টারের চেম্বার তথ্য ও সিরিয়াল হটলাইন।
+            </p>
+        </div>
+    </div>
+
+    <!-- Search & Filter Bar (Colorful Accents) -->
+    <div class="bg-white p-5 rounded-3xl border border-teal-100 shadow-md shadow-teal-500/5 space-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+            <div>
+                <label data-i18n="doc_search_label" class="block font-black text-slate-700 uppercase mb-1">ডাক্তার বা চেম্বার খুঁজুন</label>
+                <input type="text" id="search-query" data-i18n-placeholder="doc_search_placeholder" placeholder="নাম, পপুলার, ইবনে সিনা..." class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-teal-500 text-xs font-medium">
+            </div>
+            <div>
+                <label data-i18n="doc_div_label" class="block font-black text-slate-700 uppercase mb-1">বিভাগ (Division)</label>
+                <select id="filter-division" class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-300 text-xs font-bold text-slate-700">
+                    <option value="All" data-i18n="doc_div_all">সকল বিভাগ (All)</option>
+                    <option value="Dhaka" selected>Dhaka (ঢাকা)</option>
+                    <option value="Chattogram">Chattogram (চট্টগ্রাম)</option>
+                    <option value="Sylhet">Sylhet (সিলেট)</option>
+                    <option value="Rajshahi">Rajshahi (রাজশাহী)</option>
+                </select>
+            </div>
+            <div>
+                <label data-i18n="doc_area_label" class="block font-black text-slate-700 uppercase mb-1">এলাকা / থানা (Area)</label>
+                <select id="filter-area" class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-300 text-xs font-bold text-slate-700">
+                    <option value="All" data-i18n="doc_area_all">সকল এলাকা (All)</option>
+                    <option value="Dhanmondi">Dhanmondi (ধানমন্ডি)</option>
+                    <option value="Panthapath">Panthapath (পান্থপথ)</option>
+                    <option value="Mirpur">Mirpur (মিরপুর)</option>
+                    <option value="Uttara">Uttara (উত্তরা)</option>
+                    <option value="Shantinagar">Shantinagar (শান্তিনগর)</option>
+                    <option value="Panchlaish">Panchlaish (পাঁচলাইশ)</option>
+                </select>
+            </div>
+            <div>
+                <label data-i18n="doc_spec_label" class="block font-black text-slate-700 uppercase mb-1">বিশেষজ্ঞ বিভাগ (Specialty)</label>
+                <select id="filter-specialty" class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-300 text-xs font-bold text-teal-800">
+                    <option value="All" data-i18n="doc_spec_all">সকল বিশেষজ্ঞ (All)</option>
+                    <option value="Medicine" data-i18n="doc_spec_med">মেডিসিন ও ডায়াবেটিস</option>
+                    <option value="Cardiology" data-i18n="doc_spec_cardio">কার্ডিওলজি ও হৃদরোগ</option>
+                    <option value="Neurology" data-i18n="doc_spec_neuro">নিউরোমেডিসিন</option>
+                    <option value="Pediatrics" data-i18n="doc_spec_pedia">শিশু বিশেষজ্ঞ</option>
+                    <option value="Orthopedics" data-i18n="doc_spec_ortho">অর্থোপেডিক ও হাড়</option>
+                    <option value="Nephrology" data-i18n="doc_spec_nephro">কিডনি রোগ বিশেষজ্ঞ</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="flex justify-end pt-2 border-t border-slate-100">
+            <button onclick="fetchDoctors()" data-i18n="doc_search_btn" class="px-6 py-2.5 bg-gradient-to-r from-teal-600 via-emerald-600 to-cyan-600 hover:from-teal-700 hover:to-emerald-700 text-white font-extrabold rounded-2xl text-xs transition shadow-md shadow-teal-500/25 transform hover:-translate-y-0.5">
+                🔍 অনুসন্ধান করুন
+            </button>
+        </div>
+    </div>
+
+    <!-- Doctor Directory Cards Container -->
+    <div id="doctors-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div data-i18n="doc_loading" class="col-span-full py-12 text-center text-slate-400 text-sm">ডাক্তার তালিকা লোড হচ্ছে...</div>
+    </div>
+
+</div>
+
+<!-- Book / Save Appointment Modal -->
+<div id="book-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-teal-100">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+            <h3 data-i18n="doc_modal_title" class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <span>🗓️</span> ডাক্তারের চেম্বার সিরিয়াল যুক্ত করুন
+            </h3>
+            <button onclick="closeBookModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
+        </div>
+
+        <form id="book-form" class="space-y-3 text-xs">
+            <input type="hidden" id="book-doctor-id">
+            <input type="hidden" id="book-member-id" value="{{ active_member.id }}">
+
+            <div>
+                <label data-i18n="doc_patient_name" class="block font-bold text-slate-700 mb-1">রোগীর নাম (পরিবার সদস্য)</label>
+                <input type="text" value="{{ active_member.name }}" disabled class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-700 font-bold">
+            </div>
+
+            <div>
+                <label data-i18n="doc_name_label" class="block font-bold text-slate-700 mb-1">ডাক্তারের নাম</label>
+                <input type="text" id="book-doctor-name" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-2xl font-bold text-slate-900">
+            </div>
+
+            <div>
+                <label data-i18n="doc_chamber_label" class="block font-bold text-slate-700 mb-1">চেম্বার ও ঠিকানা</label>
+                <input type="text" id="book-chamber-name" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-2xl">
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label data-i18n="doc_date_label" class="block font-bold text-slate-700 mb-1">সাক্ষাতের তারিখ</label>
+                    <input type="date" id="book-date" required class="w-full px-3 py-2.5 border border-slate-300 rounded-2xl">
+                </div>
+                <div>
+                    <label data-i18n="doc_time_label" class="block font-bold text-slate-700 mb-1">সময় (Time)</label>
+                    <input type="text" id="book-time" data-i18n-placeholder="doc_time_placeholder" placeholder="০৬:৩০ PM" required class="w-full px-3 py-2.5 border border-slate-300 rounded-2xl">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label data-i18n="doc_serial_no_label" class="block font-bold text-slate-700 mb-1">সিরিয়াল নম্বর</label>
+                    <input type="text" id="book-serial-no" data-i18n-placeholder="doc_serial_no_placeholder" placeholder="যেমনঃ Serial #14" class="w-full px-3 py-2.5 border border-teal-300 bg-teal-50/50 rounded-2xl font-black text-teal-900">
+                </div>
+                <div>
+                    <label data-i18n="doc_hotline_label" class="block font-bold text-slate-700 mb-1">সিরিয়াল ফোন নম্বর</label>
+                    <input type="text" id="book-serial-contact" class="w-full px-3 py-2.5 border border-slate-300 rounded-2xl">
+                </div>
+            </div>
+
+            <div>
+                <label data-i18n="doc_notes_label" class="block font-bold text-slate-700 mb-1">পরামর্শ / পূর্ববর্তী রিপোর্ট সাথে নেওয়ার নোট</label>
+                <textarea id="book-notes" rows="2" data-i18n-placeholder="doc_notes_placeholder" placeholder="যেমনঃ নতুন FBS ও লিপিড প্রোফাইল টেস্ট ফাইল সাথে নেবেন..." class="w-full px-3 py-2.5 border border-slate-300 rounded-2xl"></textarea>
+            </div>
+
+            <div class="pt-3 flex gap-2">
+                <button type="button" onclick="closeBookModal()" data-i18n="btn_cancel" class="w-1/2 py-2.5 rounded-2xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-100 transition">বাতিল</button>
+                <button type="submit" data-i18n="btn_save" class="w-1/2 py-2.5 rounded-2xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-extrabold shadow-md shadow-teal-500/25 transition">সংরক্ষণ করুন</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function fetchDoctors() {
+    const q = document.getElementById('search-query').value.trim();
+    const div = document.getElementById('filter-division').value;
+    const area = document.getElementById('filter-area').value;
+    const spec = document.getElementById('filter-specialty').value;
+
+    let url = `/api/doctors?division=${encodeURIComponent(div)}&area=${encodeURIComponent(area)}&specialty=${encodeURIComponent(spec)}`;
+    if (q) url += `&q=${encodeURIComponent(q)}`;
+
+    try {
+        const res = await fetch(url);
+        const doctors = await res.json();
+        renderDoctors(doctors);
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+function getSpecialtyBadgeStyle(specialty) {
+    const s = specialty.toLowerCase();
+    if (s.includes('cardio') || s.includes('হৃদ')) {
+        return "bg-rose-100 text-rose-800 border-rose-200";
+    } else if (s.includes('med') || s.includes('মেডিসিন') || s.includes('diabet')) {
+        return "bg-emerald-100 text-emerald-800 border-emerald-200";
+    } else if (s.includes('neuro') || s.includes('নিউরো')) {
+        return "bg-purple-100 text-purple-800 border-purple-200";
+    } else if (s.includes('pediat') || s.includes('শিশু')) {
+        return "bg-sky-100 text-sky-800 border-sky-200";
+    } else if (s.includes('ortho') || s.includes('হাড়')) {
+        return "bg-amber-100 text-amber-800 border-amber-200";
+    } else if (s.includes('nephro') || s.includes('কিডনি')) {
+        return "bg-teal-100 text-teal-800 border-teal-200";
+    }
+    return "bg-indigo-100 text-indigo-800 border-indigo-200";
+}
+
+function renderDoctors(doctors) {
+    const grid = document.getElementById('doctors-grid');
+    grid.innerHTML = '';
+    const lang = getLanguage();
+
+    if (doctors.length === 0) {
+        grid.innerHTML = `
+            <div class="col-span-full py-12 text-center text-slate-500 bg-white rounded-3xl border border-slate-200 shadow-sm">
+                ${t('doc_not_found')}
+            </div>
+        `;
+        return;
+    }
+
+    doctors.forEach(doc => {
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-3xl border border-slate-200/90 p-6 shadow-md shadow-slate-100 glow-card flex flex-col justify-between space-y-4";
+        
+        const badgeClass = getSpecialtyBadgeStyle(doc.specialty);
+        const chamberLabel = lang === 'bn' ? 'চেম্বার:' : 'Chamber:';
+        const affiliation = doc.hospital_affiliation || (lang === 'bn' ? 'সরকারী মেডিকেল কলেজ হাসপাতাল' : 'Government Medical College Hospital');
+
+        card.innerHTML = `
+            <div class="space-y-3.5">
+                <div class="flex justify-between items-start gap-2">
+                    <div class="flex items-start gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-teal-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white text-lg font-black shadow-md shadow-indigo-500/20 flex-shrink-0">
+                            👨‍⚕️
+                        </div>
+                        <div>
+                            <span class="inline-block text-[10px] font-black px-2.5 py-0.5 rounded-full ${badgeClass} border uppercase tracking-wider mb-1">
+                                ${doc.specialty}
+                            </span>
+                            <h3 class="text-base font-extrabold text-slate-900">${doc.name}</h3>
+                            <p class="text-xs text-slate-600 font-bold">${doc.degrees}</p>
+                        </div>
+                    </div>
+                    ${doc.bmdc_reg_no ? `<span class="text-[10px] bg-amber-50 text-amber-900 border border-amber-200 font-mono font-black px-2 py-0.5 rounded-lg flex-shrink-0 shadow-sm">BMDC: ${doc.bmdc_reg_no}</span>` : ''}
+                </div>
+
+                <div class="text-xs text-slate-600 bg-gradient-to-br from-slate-50 to-teal-50/30 p-3.5 rounded-2xl space-y-1.5 border border-slate-100">
+                    <p class="font-bold text-slate-900 flex items-center gap-1.5">
+                        <span>🏥</span> <span>${affiliation}</span>
+                    </p>
+                    <p class="flex items-center gap-1.5">
+                        <span>🏢</span> <strong>${chamberLabel}</strong> ${doc.chamber_name}
+                    </p>
+                    <p class="text-slate-500 flex items-center gap-1.5">
+                        <span>📍</span> ${doc.chamber_address || ''} (${doc.area}, ${doc.district})
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap justify-between items-center text-xs pt-2 border-t border-slate-100">
+                    <div>
+                        <span class="text-slate-400 font-medium">${t('doc_visiting_time')}</span>
+                        <span class="font-extrabold text-slate-700 block">${doc.visiting_days} (${doc.visiting_hours})</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-slate-400 font-medium">${t('doc_fee')}</span>
+                        <span class="font-black text-emerald-700 text-sm block">৳ ${doc.consultation_fee}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-2.5 pt-2 border-t border-slate-100">
+                <a href="tel:${doc.serial_phone}" class="flex-1 text-center py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold rounded-2xl transition">
+                    ${t('doc_call_prefix')} ${doc.serial_phone.split(',')[0]}
+                </a>
+                <button onclick="openBookModal(${JSON.stringify(doc).replace(/"/g, '&quot;')})" class="flex-1 py-2.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white text-xs font-extrabold rounded-2xl shadow-md shadow-teal-500/20 transition transform hover:-translate-y-0.5">
+                    ${t('doc_save_serial')}
+                </button>
+            </div>
+        `;
+
+        grid.appendChild(card);
+    });
+}
+
+function openBookModal(doc) {
+    document.getElementById('book-doctor-id').value = doc.id;
+    document.getElementById('book-doctor-name').value = doc.name;
+    document.getElementById('book-chamber-name').value = `${doc.chamber_name} (${doc.area})`;
+    document.getElementById('book-serial-contact').value = doc.serial_phone.split(',')[0];
+    document.getElementById('book-time').value = doc.visiting_hours.split('-')[0].trim();
+    document.getElementById('book-date').valueAsDate = new Date();
+    document.getElementById('book-modal').classList.remove('hidden');
+}
+
+function closeBookModal() {
+    document.getElementById('book-modal').classList.add('hidden');
+}
+
+document.getElementById('book-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        member_id: parseInt(document.getElementById('book-member-id').value),
+        doctor_id: parseInt(document.getElementById('book-doctor-id').value) || null,
+        doctor_name: document.getElementById('book-doctor-name').value,
+        chamber_name: document.getElementById('book-chamber-name').value,
+        appointment_date: document.getElementById('book-date').value,
+        appointment_time: document.getElementById('book-time').value,
+        serial_number: document.getElementById('book-serial-no').value || null,
+        serial_contact: document.getElementById('book-serial-contact').value || null,
+        doctor_advice: document.getElementById('book-notes').value || null
+    };
+
+    try {
+        const res = await fetch('/api/appointments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+            showToast(t('doc_toast_saved'), "success");
+            closeBookModal();
+            setTimeout(() => window.location.href = '/appointments', 500);
+        } else {
+            showToast("Failed to save", "error");
+        }
+    } catch (e) {
+        showToast("Error occurred", "error");
+    }
+});
+
+window.addEventListener('languageChanged', () => {
+    fetchDoctors();
+});
+
+document.addEventListener("DOMContentLoaded", fetchDoctors);
+</script>
+{% endblock %}

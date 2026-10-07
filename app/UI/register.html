@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}রেজিস্ট্রেশন - MediTrack Bangladesh{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto my-8">
+    <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-md">
+        <div class="text-center mb-6">
+            <h2 class="text-2xl font-bold text-slate-900">নতুন অ্যাকাউন্ট তৈরি করুন</h2>
+            <p class="text-xs text-slate-500 mt-1">আপনার ও পরিবারের নিয়মিত স্বাস্থ্য ট্র্যাকিং শুরু করুন</p>
+        </div>
+
+        <form id="register-form" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">পূর্ণ নাম</label>
+                <input type="text" id="name" required placeholder="উদাঃ মোঃ আরিফুল ইসলাম" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">ইমেইল ঠিকানা</label>
+                <input type="email" id="email" required placeholder="ariful@gmail.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">মোবাইল নম্বর (ঐচ্ছিক)</label>
+                <input type="text" id="phone" placeholder="017xxxxxxxx" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">পাসওয়ার্ড</label>
+                <input type="password" id="password" required minlength="6" placeholder="কমপক্ষে ৬ অক্ষর" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm">
+            </div>
+
+            <div id="register-error" class="hidden p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium"></div>
+
+            <button type="submit" id="submit-btn" class="w-full py-3 rounded-xl bg-primary-700 hover:bg-primary-800 text-white font-bold text-sm shadow-md transition">
+                অ্যাকাউন্ট খুলুন
+            </button>
+        </form>
+
+        <div class="mt-6 text-center text-xs text-slate-600">
+            ইতিমধ্যে অ্যাকাউন্ট আছে? <a href="/login" class="text-primary-700 font-bold hover:underline">লগইন করুন</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('register-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    const errBox = document.getElementById('register-error');
+    errBox.classList.add('hidden');
+    btn.disabled = true;
+    btn.innerText = 'অ্যাকাউন্ট তৈরি হচ্ছে...';
+
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const password = document.getElementById('password').value;
+
+    try {
+        const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, phone, password })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            throw new Error(data.detail || 'নিবন্ধন সম্পন্ন করা যায়নি।');
+        }
+        showToast('অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে!', 'success');
+        setTimeout(() => {
+            window.location.href = '/dashboard';
+        }, 500);
+    } catch (err) {
+        errBox.innerText = err.message;
+        errBox.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerText = 'অ্যাকাউন্ট খুলুন';
+    }
+});
+</script>
+{% endblock %}

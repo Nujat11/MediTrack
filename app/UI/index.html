@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}MediTrack BD - বাংলাদেশের মানুষের জন্য ওষুধ ও চিকিৎসা ট্র্যাকিং প্ল্যাটফর্ম{% endblock %}
+
+{% block content %}
+<div class="space-y-12 py-4">
+    
+    <!-- Hero Banner (Vibrant Multi-tone Radial Gradient) -->
+    <div class="bg-gradient-to-br from-teal-950 via-slate-900 to-indigo-950 rounded-3xl p-8 sm:p-14 text-white shadow-2xl relative overflow-hidden border border-teal-900">
+        <div class="absolute -right-10 -bottom-10 w-96 h-96 bg-gradient-to-br from-teal-500/20 via-emerald-500/20 to-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute left-1/3 -top-20 w-72 h-72 bg-purple-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="relative z-10 max-w-3xl space-y-6">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-teal-300 text-xs font-black">
+                <span>🇧🇩</span>
+                <span data-i18n="home_badge">বাংলাদেশের স্বাস্থ্যব্যবস্থা ও প্রেসক্রিপশন সংস্কৃতির জন্য বিশেষায়িত</span>
+            </div>
+            
+            <h1 data-i18n="home_title" class="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+                সময়মতো সঠিক ওষুধ সেবন ও চিকিৎসকের চেম্বার ট্র্যাকিং এখন সহজ
+            </h1>
+            
+            <p data-i18n="home_desc" class="text-slate-200 text-base sm:text-lg leading-relaxed font-normal">
+                প্রেসক্রিপশনের কাগজ হারিয়ে যাওয়া কিংবা বাবা-মায়ের ডায়াবেটিস ও প্রেসারের ওষুধের সময়সূচি মনে রাখার ঝামেলা দূর করুন। ১+০+১ নিয়ম, খাওয়ার আগে/পরে এবং প্রাইভেট চেম্বার সিরিয়াল—সবকিছু এক প্ল্যাটফর্মে।
+            </p>
+
+            <div class="pt-4 flex flex-wrap gap-4 items-center">
+                <a href="/login" class="px-7 py-4 rounded-2xl bg-gradient-to-r from-teal-400 via-emerald-400 to-cyan-300 hover:from-teal-300 hover:to-cyan-200 text-slate-950 font-black text-sm sm:text-base shadow-xl shadow-teal-500/30 transition transform hover:-translate-y-1 flex items-center gap-2">
+                    <span data-i18n="home_btn_demo">🚀 ডেমো অ্যাকাউন্ট দিয়ে ব্যবহার করুন</span>
+                </a>
+                <a href="/register" data-i18n="home_btn_register" class="px-7 py-4 rounded-2xl bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold text-sm sm:text-base backdrop-blur-sm transition">
+                    নতুন অ্যাকাউন্ট তৈরি করুন
+                </a>
+            </div>
+
+            <div class="pt-4 border-t border-white/10 flex flex-wrap gap-6 text-xs text-teal-100/90 font-bold">
+                <div class="flex items-center gap-2" data-i18n="home_feat_pharma">
+                    ✓ দেশীয় ফার্মা ব্র্যান্ড (Napa, Seclo, Monas)
+                </div>
+                <div class="flex items-center gap-2" data-i18n="home_feat_caregiver">
+                    ✓ পরিবার ও বয়স্কদের কেয়ারগিভার ট্র্যাকিং
+                </div>
+                <div class="flex items-center gap-2" data-i18n="home_feat_chamber">
+                    ✓ জনপ্রিয় চেম্বার ও সিরিয়াল ডিরেক্টরি
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bangladeshi Context Core Highlights (Vibrant Colorful Cards) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Feature 1: Sunrise Amber/Orange -->
+        <div class="bg-gradient-to-br from-amber-50 to-orange-100/70 p-7 rounded-3xl border border-amber-200 shadow-md shadow-amber-500/5 hover:shadow-xl transition transform hover:-translate-y-1 space-y-3">
+            <div data-i18n="home_card1_icon" class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center font-black text-lg shadow-md shadow-orange-500/25">
+                ১+০+১
+            </div>
+            <h3 data-i18n="home_card1_title" class="text-lg font-black text-slate-900">দেশীয় প্রেসক্রিপশন রুটিন</h3>
+            <p data-i18n="home_card1_desc" class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
+                বাংলাদেশের চিকিৎসকদের ১+০+১ কিংবা ১+১+১ নিয়ম এবং "খাওয়ার আগে", "ভরা পেটে" বা "শোবার আগে" সময়সূচী সহজে সেট করুন। রমজান মাসে স্বয়ংক্রিয় সেহরি-ইফতার মোড।
+            </p>
+        </div>
+
+        <!-- Feature 2: Sky Blue / Royal Indigo -->
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-100/70 p-7 rounded-3xl border border-blue-200 shadow-md shadow-blue-500/5 hover:shadow-xl transition transform hover:-translate-y-1 space-y-3">
+            <div data-i18n="home_card2_icon" class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-black text-2xl shadow-md shadow-indigo-500/25">
+                👨‍👩‍👧
+            </div>
+            <h3 data-i18n="home_card2_title" class="text-lg font-black text-slate-900">বাবা-মায়ের কেয়ারগিভার ট্র্যাকিং</h3>
+            <p data-i18n="home_card2_desc" class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
+                কর্মজীবী সন্তানেরা সহজেই দূরে থেকেও বাবা-মা বা পরিবারের সদস্যদের ডায়াবেটিস ও প্রেসারের ওষুধ সময়মতো খাওয়া হয়েছে কি না তা এক ক্লিকে নজর রাখতে পারবেন।
+            </p>
+        </div>
+
+        <!-- Feature 3: Emerald & Teal -->
+        <div class="bg-gradient-to-br from-emerald-50 to-teal-100/70 p-7 rounded-3xl border border-emerald-200 shadow-md shadow-emerald-500/5 hover:shadow-xl transition transform hover:-translate-y-1 space-y-3">
+            <div data-i18n="home_card3_icon" class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center font-black text-2xl shadow-md shadow-teal-500/25">
+                🏥
+            </div>
+            <h3 data-i18n="home_card3_title" class="text-lg font-black text-slate-900">প্রাইভেট চেম্বার ও সিরিয়াল</h3>
+            <p data-i18n="home_card3_desc" class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
+                পপুলার, ইবনে সিনা, ল্যাবএইডসহ ঢাকা ও প্রধান শহরের বিশেষজ্ঞ চিকিৎসকদের চেম্বার ঠিকানা, ভিজিটিং সময় এবং সিরিয়াল ফোন নম্বর সহজে খুঁজুন ও সংরক্ষণ করুন।
+            </p>
+        </div>
+    </div>
+
+    <!-- Quick Demo Access Card (Vibrant Glass Border) -->
+    <div class="bg-gradient-to-r from-teal-50 via-white to-indigo-50 border-2 border-teal-300 rounded-3xl p-7 sm:p-9 flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg shadow-teal-500/10">
+        <div class="space-y-2">
+            <span data-i18n="home_demo_badge" class="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-teal-600 to-emerald-600 text-white text-xs font-black shadow-sm">
+                ⚡ তাৎক্ষণিক টেস্ট ক্রেডেনশিয়াল
+            </span>
+            <h3 data-i18n="home_demo_title" class="text-xl font-black text-slate-900">এক ক্লিকেই পরীক্ষা করতে লগইন করুন</h3>
+            <p class="text-xs sm:text-sm text-slate-600 font-medium">
+                <span data-i18n="home_demo_desc">ইমেইল: <code class="bg-white px-2.5 py-1 rounded-lg border border-teal-200 text-teal-800 font-mono font-black">demo@meditrack.bd</code> | পাসওয়ার্ড: <code class="bg-white px-2.5 py-1 rounded-lg border border-teal-200 text-teal-800 font-mono font-black">password123</code></span>
+            </p>
+            <p data-i18n="home_demo_admin" class="text-xs text-slate-500">
+                (অ্যাডমিন প্যানেল: <code class="bg-white px-2 py-0.5 rounded border text-amber-800 font-mono font-bold">admin@meditrack.bd</code> / <code class="bg-white px-2 py-0.5 rounded border text-amber-800 font-mono font-bold">admin123</code>)
+            </p>
+        </div>
+        <a href="/login" data-i18n="home_demo_btn" class="whitespace-nowrap px-7 py-3.5 rounded-2xl bg-gradient-to-r from-teal-600 to-indigo-600 hover:from-teal-700 hover:to-indigo-700 text-white font-black text-sm shadow-lg shadow-teal-500/25 transition transform hover:-translate-y-0.5">
+            লগইন পেজে যান →
+        </a>
+    </div>
+
+</div>
+{% endblock %}
