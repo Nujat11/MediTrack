@@ -92,14 +92,4 @@ You may also run the project using the included script:
 python run.py
 ```
 
-## Default Behavior
-
-The app seeds initial medicine and doctor data automatically when first launched. This helps provide example records for testing and demo usage.
-
-## Notes
-
-This project is intended for healthcare tracking and patient support workflows. It can be extended with additional features such as email reminders, SMS alerts, analytics, and stronger role-based access control.
-
-## License
-
-This project is for educational and demonstration purposes unless otherwise specified by the repository owner.
+onal and demonstration purposes unless otherwise specified by the repository owner.
