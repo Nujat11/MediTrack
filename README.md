@@ -91,5 +91,3 @@ You may also run the project using the included script:
 ```bash
 python run.py
 ```
-
-onal and demonstration purposes unless otherwise specified by the repository owner.
